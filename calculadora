@@ -1,0 +1,13 @@
+from datetime   import  datetime
+
+dia = int(input("ingresa tu dia de nacimiento: "))
+mes = int(input("ingresa tu mes de nacimiento: "))
+año = int(input("ingresa tu año de nacimiento: "))
+
+fecha_nacimiento = datetime(año,mes,dia)
+
+hoy = datetime.now()
+
+dias_vividos = (hoy - fecha_nacimiento).days
+
+print("has vivido ",dias_vividos, " dias")
