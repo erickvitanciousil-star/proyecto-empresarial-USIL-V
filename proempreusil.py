@@ -2,7 +2,10 @@ import flet as ft
 import random
 import string
 import re
+import time
+import threading
 import os
+import flet_fastapi
 
 GOOGLE_LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
 PERU_FLAG_URL = "https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg"
@@ -68,7 +71,7 @@ def validar_correo(correo):
 def main(page: ft.Page):
     page.title = "Proyecto Empresarial USIL - Desayunos Express"
     page.bgcolor = "#FAFAFA"
-    page.padding = 20
+    page.padding = 10 if page.width < 600 else 20
     page.scroll = ft.ScrollMode.AUTO
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.vertical_alignment = ft.MainAxisAlignment.START
@@ -118,6 +121,37 @@ def main(page: ft.Page):
             pass
 
     page.pubsub.subscribe(recibir_actualizacion_global)
+
+    def mostrar_splash():
+        splash_content = ft.Container(
+            content=ft.Column([
+                ft.Container(
+                    content=ft.Text("D", size=64, weight=ft.FontWeight.BOLD, color="white"),
+                    bgcolor="#E05638",
+                    width=110,
+                    height=110,
+                    border_radius=28,
+                    alignment=ft.alignment.center,
+                    shadow=ft.BoxShadow(spread_radius=2, blur_radius=15, color="#20000000")
+                ),
+                ft.Container(height=15),
+                ft.Text("Proyecto Empresarial USIL", size=13, color="#7A685D", weight=ft.FontWeight.W_500)
+            ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+            alignment=ft.alignment.center,
+            bgcolor="#FFFFFF",
+            expand=True,
+            width=page.width,
+            height=page.height if page.height else 800
+        )
+        contenido_principal.controls.clear()
+        contenido_principal.controls.append(splash_content)
+        page.update()
+
+        def cambiar_a_login():
+            time.sleep(1.2)
+            mostrar_login("cliente", "login")
+
+        threading.Thread(target=cambiar_a_login, daemon=True).start()
 
     def mostrar_login(tipo_login="cliente", sub_accion="login"):
         def ingresar_cliente(e):
@@ -259,12 +293,11 @@ def main(page: ft.Page):
             border=ft.InputBorder.NONE,
             bgcolor="#E8F0FE",
             color="#2C221E",
-            content_padding=ft.padding.symmetric(horizontal=12, vertical=12),
+            content_padding=10,
             expand=True,
             on_submit=continuar_celular
         )
 
-        # Contenedor con la bandera oficial a color del Perú a la izquierda de +51
         campo_celular_estilo = ft.Container(
             content=ft.Row([
                 ft.Container(
@@ -274,8 +307,8 @@ def main(page: ft.Page):
                         ft.Icon(ft.icons.ARROW_DROP_DOWN, size=18, color="#5F6368")
                     ], spacing=6, alignment=ft.MainAxisAlignment.CENTER, vertical_alignment=ft.CrossAxisAlignment.CENTER),
                     bgcolor="#F1F3F4",
-                    padding=ft.padding.symmetric(horizontal=10, vertical=12),
-                    border_radius=ft.border_radius.only(top_left=6, bottom_left=6)
+                    padding=10,
+                    border_radius=6,
                 ),
                 ft.Container(
                     content=tf_celular_input,
@@ -286,7 +319,7 @@ def main(page: ft.Page):
             bgcolor="#E8F0FE",
             border_radius=6,
             height=48,
-            width=360
+            width=340 if page.width < 600 else 360
         )
 
         tf_admin_user = ft.TextField(label="Usuario Negocio", value="cocina", bgcolor="#FFFFFF", border_color="#E0D7CD", focused_border_color="#E05638", color="#000000", on_submit=lambda e: ingresar_negocio(e), width=340)
@@ -341,12 +374,12 @@ def main(page: ft.Page):
                 ft.Container(height=40),
                 btn_volver_menu,
                 ft.Container(height=20),
-                ft.Text("Ingresa tu número de celular", size=26, weight=ft.FontWeight.BOLD, color="#2C221E", text_align=ft.TextAlign.CENTER),
+                ft.Text("Ingresa tu número de celular", size=24 if page.width < 600 else 26, weight=ft.FontWeight.BOLD, color="#2C221E", text_align=ft.TextAlign.CENTER),
                 ft.Text("Te enviaremos un código para confirmarlo", size=14, color="#5F6368", text_align=ft.TextAlign.CENTER),
                 ft.Container(height=25),
                 campo_celular_estilo,
                 ft.Container(height=15),
-                ft.TextButton("Enviar código de acceso", style=ft.ButtonStyle(bgcolor="#E05638", color="white", shape=ft.RoundedRectangleBorder(radius=24)), height=48, width=360, on_click=continuar_celular)
+                ft.TextButton("Enviar código de acceso", style=ft.ButtonStyle(bgcolor="#E05638", color="white", shape=ft.RoundedRectangleBorder(radius=24)), height=48, width=340 if page.width < 600 else 360, on_click=continuar_celular)
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=6)
 
             contenido_principal.controls.clear()
@@ -423,7 +456,7 @@ def main(page: ft.Page):
         elementos_tarjeta = [
             header_app_nombre,
             ft.Divider(color="#EFEBE4", height=15),
-            ft.Text("Regístrate o ingresa para continuar", size=22, weight=ft.FontWeight.BOLD, color="#2C221E", text_align=ft.TextAlign.CENTER),
+            ft.Text("Regístrate o ingresa para continuar", size=20 if page.width < 600 else 22, weight=ft.FontWeight.BOLD, color="#2C221E", text_align=ft.TextAlign.CENTER),
             ft.Text("Elige tu método preferido de acceso rápido", size=13, color="#7A685D", text_align=ft.TextAlign.CENTER),
             ft.Container(height=10),
             form_contenido
@@ -432,8 +465,8 @@ def main(page: ft.Page):
         tarjeta_principal = ft.Container(
             content=ft.Column(elementos_tarjeta, spacing=12, alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
             bgcolor="#FFFFFF",
-            padding=36,
-            width=460,
+            padding=20 if page.width < 600 else 36,
+            width=page.width - 30 if page.width < 600 else 460,
             border_radius=16,
             border=ft.Border(
                 top=ft.BorderSide(1, "#EFEBE4"),
@@ -447,13 +480,16 @@ def main(page: ft.Page):
         contenido_principal.controls.clear()
         contenido_principal.controls.append(ft.Container(height=10))
         contenido_principal.controls.append(tarjeta_principal)
-        
+        page.update()
 
     def mostrar_app_cliente(vista_activa="menu"):
         nonlocal filtro_categoria, busqueda_texto, sede_actual, puesto_seleccionado, vista_actual_cliente
         vista_actual_cliente = vista_activa
         
-        contenedor_cliente = ft.Column(spacing=16, horizontal_alignment=ft.CrossAxisAlignment.CENTER, width=1000)
+        es_movil = page.width < 600
+        ancho_contenedor = page.width - 20 if es_movil else 1000
+
+        contenedor_cliente = ft.Column(spacing=16, horizontal_alignment=ft.CrossAxisAlignment.CENTER, width=ancho_contenedor)
 
         def cambiar_sede(e):
             nonlocal sede_actual, puesto_seleccionado
@@ -469,7 +505,7 @@ def main(page: ft.Page):
             bgcolor="#FFFFFF",
             border_color="#E0D7CD",
             color="#000000",
-            width=420
+            width=page.width - 40 if es_movil else 420
         )
         dd_sede.on_change = cambiar_sede
 
@@ -481,36 +517,36 @@ def main(page: ft.Page):
             banner_estado = ft.Container(
                 content=ft.Row([
                     ft.Icon(ft.icons.NOTIFICATIONS_ACTIVE if es_listo else ft.icons.ACCESS_TIME, color="white", size=18),
-                    ft.Text(f"Pedido #{p_ultimo['codigo']}: {p_ultimo['estado']} en {p_ultimo.get('puesto', '')}", color="white", weight=ft.FontWeight.BOLD, size=13)
+                    ft.Text(f"Pedido #{p_ultimo['codigo']}: {p_ultimo['estado']} en {p_ultimo.get('puesto', '')}", color="white", weight=ft.FontWeight.BOLD, size=12 if es_movil else 13)
                 ], alignment=ft.MainAxisAlignment.CENTER, spacing=8),
                 bgcolor="#2E7D32" if es_listo else "#E05638",
                 padding=10,
                 border_radius=10,
-                width=900
+                width=ancho_contenedor
             )
 
         header = ft.Container(
-            content=ft.Row([
-                ft.Column([
-                    ft.Text(f"¡Hola, {usuario_actual['nombre']}! 👋", size=18, weight=ft.FontWeight.BOLD, color="#2C221E"),
-                    dd_sede
-                ]),
-                ft.TextButton(
-                    "Cerrar Sesión", 
-                    style=ft.ButtonStyle(color="#E05638"),
-                    on_click=lambda e: mostrar_login("cliente")
-                )
-            ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-            width=900
+            content=ft.Column([
+                ft.Row([
+                    ft.Text(f"¡Hola, {usuario_actual['nombre']}! 👋", size=16 if es_movil else 18, weight=ft.FontWeight.BOLD, color="#2C221E"),
+                    ft.TextButton(
+                        "Cerrar Sesión", 
+                        style=ft.ButtonStyle(color="#E05638"),
+                        on_click=lambda e: mostrar_login("cliente")
+                    )
+                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN, width=ancho_contenedor),
+                dd_sede
+            ], spacing=10),
+            width=ancho_contenedor
         )
 
         nav_buttons = ft.Row([
             ft.TextButton("🛒 Menú", style=ft.ButtonStyle(bgcolor="#E05638" if vista_activa == "menu" else "#EFEBE4", color="white" if vista_activa == "menu" else "#2C221E"), on_click=lambda e: mostrar_app_cliente("menu")),
             ft.TextButton("🛵 Mis Pedidos", style=ft.ButtonStyle(bgcolor="#E05638" if vista_activa == "pedidos" else "#EFEBE4", color="white" if vista_activa == "pedidos" else "#2C221E"), on_click=lambda e: mostrar_app_cliente("pedidos")),
             ft.TextButton("❤️ Favoritos", style=ft.ButtonStyle(bgcolor="#E05638" if vista_activa == "favs" else "#EFEBE4", color="white" if vista_activa == "favs" else "#2C221E"), on_click=lambda e: mostrar_app_cliente("favs")),
-        ], spacing=10, alignment=ft.MainAxisAlignment.CENTER)
+        ], spacing=5 if es_movil else 10, alignment=ft.MainAxisAlignment.CENTER)
 
-        lbl_total = ft.Text("Total: S/ 0.00", size=20, weight=ft.FontWeight.BOLD, color="#E05638")
+        lbl_total = ft.Text("Total: S/ 0.00", size=18 if es_movil else 20, weight=ft.FontWeight.BOLD, color="#E05638")
 
         def actualizar_total():
             t = sum(cantidades[p["nombre"]] * p["precio"] for p in productos)
@@ -543,15 +579,17 @@ def main(page: ft.Page):
             es_fav = prod["nombre"] in db_global["favoritos"]
             fav_color = "#E05638" if es_fav else "#C5B8AB"
 
+            ancho_tarjeta = (page.width - 30) if es_movil else 240
+
             if "img" in prod:
-                media_control = ft.Image(src=prod["img"], width=220, height=110, fit="cover")
+                media_control = ft.Image(src=prod["img"], width=ancho_tarjeta - 20, height=110, fit="cover")
             else:
                 media_control = ft.Icon(prod["icon"], size=50, color="#E05638")
 
             return ft.Container(
                 content=ft.Column([
                     ft.Stack([
-                        ft.Container(content=media_control, height=110, width=220, bgcolor="#FDF2E9", border_radius=10),
+                        ft.Container(content=media_control, height=110, width=ancho_tarjeta - 20, bgcolor="#FDF2E9", border_radius=10),
                         ft.IconButton(ft.icons.FAVORITE, icon_color=fav_color, icon_size=20, top=2, right=2, on_click=toggle_fav)
                     ]),
                     ft.Text(prod["nombre"], weight=ft.FontWeight.BOLD, color="#2C221E", size=14, no_wrap=True),
@@ -571,53 +609,71 @@ def main(page: ft.Page):
                     left=ft.BorderSide(1, "#EFEBE4"),
                     right=ft.BorderSide(1, "#EFEBE4"),
                 ),
-                width=240
+                width=ancho_tarjeta
             )
 
-        contenido_seccion = ft.Column(spacing=14, width=900, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
+        contenido_seccion = ft.Column(spacing=14, width=ancho_contenedor, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
 
         if vista_activa == "menu":
+            grid_container = ft.Column(horizontal_alignment=ft.CrossAxisAlignment.CENTER)
+
+            def actualizar_grid():
+                prods_filtrados = [
+                    p for p in productos 
+                    if (filtro_categoria == "Todos" or p["cat"] == filtro_categoria) 
+                    and (not busqueda_texto or busqueda_texto in p["nombre"].lower() or busqueda_texto in p["desc"].lower())
+                ]
+                grid_container.controls.clear()
+                grid_container.controls.extend([
+                    ft.Text(f"📋 Catálogo ({len(prods_filtrados)} opciones)", size=15, weight=ft.FontWeight.BOLD, color="#2C221E"),
+                    ft.Row([tarjeta_producto(p) for p in prods_filtrados], wrap=True, alignment=ft.MainAxisAlignment.CENTER, spacing=12 if es_movil else 16)
+                ])
+                page.update()
+
             def filtrar_cat(cat):
                 nonlocal filtro_categoria
                 filtro_categoria = cat
-                mostrar_app_cliente("menu")
+                actualizar_grid()
+                actualizar_chips_cat()
 
             def buscar_prod(e):
                 nonlocal busqueda_texto
                 busqueda_texto = e.control.value.lower()
-                mostrar_app_cliente("menu")
+                actualizar_grid()
 
             tf_buscar = ft.TextField(
-                hint_text="🔍 Buscar quinua, maca, tamal, chicharrón, lomo...",
+                hint_text="🔍 Buscar producto en tiempo real...",
                 bgcolor="#FFFFFF",
                 border_color="#E0D7CD",
                 focused_border_color="#E05638",
                 color="#000000",
                 height=45,
-                width=600,
+                width=page.width - 30 if es_movil else 600,
                 value=busqueda_texto,
                 content_padding=14,
                 on_change=buscar_prod
             )
 
-            chips_cat = ft.Row([
-                ft.TextButton("Todos", style=ft.ButtonStyle(bgcolor="#E05638" if filtro_categoria == "Todos" else "#EFEBE4", color="white" if filtro_categoria == "Todos" else "#2C221E"), on_click=lambda e: filtrar_cat("Todos")),
-                ft.TextButton("☕ Bebidas", style=ft.ButtonStyle(bgcolor="#E05638" if filtro_categoria == "Bebidas" else "#EFEBE4", color="white" if filtro_categoria == "Bebidas" else "#2C221E"), on_click=lambda e: filtrar_cat("Bebidas")),
-                ft.TextButton("🥖 Panes", style=ft.ButtonStyle(bgcolor="#E05638" if filtro_categoria == "Panes" else "#EFEBE4", color="white" if filtro_categoria == "Panes" else "#2C221E"), on_click=lambda e: filtrar_cat("Panes")),
-            ], alignment=ft.MainAxisAlignment.CENTER, spacing=10)
+            chips_cat_row = ft.Row(alignment=ft.MainAxisAlignment.CENTER, spacing=6 if es_movil else 10)
 
-            prods_filtrados = [
-                p for p in productos 
-                if (filtro_categoria == "Todos" or p["cat"] == filtro_categoria) 
-                and (not busqueda_texto or busqueda_texto in p["nombre"].lower() or busqueda_texto in p["desc"].lower())
-            ]
+            def actualizar_chips_cat():
+                categorias = ["Todos", "Bebidas", "Panes"]
+                chips_cat_row.controls.clear()
+                for cat in categorias:
+                    activo = (filtro_categoria == cat)
+                    chips_cat_row.controls.append(
+                        ft.TextButton(
+                            ("☕ " if cat == "Bebidas" else "🥖 " if cat == "Panes" else "") + cat,
+                            style=ft.ButtonStyle(
+                                bgcolor="#E05638" if activo else "#EFEBE4",
+                                color="white" if activo else "#2C221E"
+                            ),
+                            on_click=lambda e, c=cat: filtrar_cat(c)
+                        )
+                    )
+                page.update()
 
-            grid_prods = ft.Row(
-                [tarjeta_producto(p) for p in prods_filtrados], 
-                wrap=True, 
-                alignment=ft.MainAxisAlignment.CENTER, 
-                spacing=16
-            )
+            actualizar_chips_cat()
 
             def ir_pago(e):
                 items = [f"{cantidades[p['nombre']]}x {p['nombre']}" for p in productos if cantidades[p["nombre"]] > 0]
@@ -631,14 +687,15 @@ def main(page: ft.Page):
                     mostrar_pago()
 
             actualizar_total()
+            actualizar_grid()
+
             contenido_seccion.controls.extend([
                 tf_buscar,
-                chips_cat,
-                ft.Text(f"📋 Catálogo ({len(prods_filtrados)} opciones)", size=15, weight=ft.FontWeight.BOLD, color="#2C221E"),
-                grid_prods,
+                chips_cat_row,
+                grid_container,
                 ft.Divider(color="#EFEBE4"),
                 lbl_total,
-                ft.TextButton("💳 Continuar con el Pago", style=ft.ButtonStyle(bgcolor="#E05638", color="white"), height=50, width=300, on_click=ir_pago)
+                ft.TextButton("💳 Continuar con el Pago", style=ft.ButtonStyle(bgcolor="#E05638", color="white"), height=50, width=page.width - 30 if es_movil else 300, on_click=ir_pago)
             ])
 
         elif vista_activa == "pedidos":
@@ -647,50 +704,117 @@ def main(page: ft.Page):
                 contenido_seccion.controls.append(ft.Text("No tienes órdenes activas en este momento.", color="#7A685D"))
             else:
                 for p in reversed(mis_p):
-                    dd_evaluar = ft.Dropdown(
-                        label="Evaluar pedido:",
-                        options=[
-                            ft.dropdown.Option("⭐ 5 Excelente"),
-                            ft.dropdown.Option("⭐ 4 Bueno"),
-                            ft.dropdown.Option("⭐ 3 Regular"),
-                            ft.dropdown.Option("⭐ 2 Malo"),
-                            ft.dropdown.Option("⭐ 1 Pésimo"),
-                        ],
-                        value="⭐ 5 Excelente",
-                        bgcolor="#FFFFFF",
-                        border_color="#E0D7CD",
-                        color="#000000",
-                        width=300
-                    )
+                    elementos_columna_orden = [
+                        ft.Row([
+                            ft.Text(f"Orden #{p['codigo']}", size=16, weight=ft.FontWeight.BOLD, color="#2C221E"),
+                            ft.Text(p['estado'], weight=ft.FontWeight.BOLD, color="#E05638" if "Preparación" in p['estado'] else "#2E7D32", size=13)
+                        ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+                        ft.Text(f"Zona: {p.get('sede', '')}", color="#7A685D", size=13),
+                        ft.Text(f"Puesto Recojo: {p.get('puesto', '')}", color="#E05638", weight=ft.FontWeight.BOLD, size=13),
+                        ft.Text(f"Detalle: {p['detalle']}", color="#2C221E", size=14),
+                        ft.Text(f"Notas: {p.get('notas', 'Sin especificaciones')}", color="#7A685D", size=12, italic=True),
+                        ft.Text("⏱️ Tiempo máximo de preparación: 10 minutos", color="#2E7D32", size=13, weight=ft.FontWeight.W_500),
+                        ft.Text(f"Pago: {p['pago']} | Total: S/ {p['total']:.2f}", color="#7A685D", size=13),
+                    ]
+
+                    if "Entregado" in p['estado']:
+                        if p.get("evaluado", False):
+                            elementos_columna_orden.extend([
+                                ft.Divider(color="#EFEBE4"),
+                                ft.Container(
+                                    content=ft.Row([
+                                        ft.Icon(ft.icons.CHECK_CIRCLE, color="#2E7D32", size=18),
+                                        ft.Text("¡Muchas gracias por tu evaluación!", color="#2E7D32", weight=ft.FontWeight.BOLD, size=13)
+                                    ], alignment=ft.MainAxisAlignment.CENTER, spacing=6),
+                                    padding=8,
+                                    bgcolor="#F0F8F1",
+                                    border_radius=8
+                                )
+                            ])
+                        else:
+                            dd_evaluar = ft.Dropdown(
+                                label="Calificación",
+                                options=[
+                                    ft.dropdown.Option("⭐ 5 Excelente"),
+                                    ft.dropdown.Option("⭐ 4 Bueno"),
+                                    ft.dropdown.Option("⭐ 3 Regular"),
+                                    ft.dropdown.Option("⭐ 2 Malo"),
+                                    ft.dropdown.Option("⭐ 1 Pésimo"),
+                                ],
+                                value="⭐ 5 Excelente",
+                                bgcolor="#FFFFFF",
+                                border_color="#E0D7CD",
+                                color="#000000",
+                                width=140 if es_movil else 160
+                            )
+
+                            tf_comentario = ft.TextField(
+                                label="Comentario...",
+                                hint_text="Opinión opcional",
+                                value="",
+                                bgcolor="#FFFFFF",
+                                border_color="#E0D7CD",
+                                focused_border_color="#E05638",
+                                color="#000000",
+                                expand=True,
+                                height=48
+                            )
+
+                            def guardar_evaluacion(e, pedido_ref=p, dropdown=dd_evaluar, campo_com=tf_comentario):
+                                pedido_ref["calificacion"] = dropdown.value
+                                pedido_ref["comentario"] = campo_com.value
+                                pedido_ref["evaluado"] = True
+                                mostrar_alerta(f"¡Gracias! Calificación guardada.")
+                                mostrar_app_cliente("pedidos")
+
+                            btn_guardar_cal = ft.TextButton(
+                                "💾 Guardar",
+                                style=ft.ButtonStyle(bgcolor="#2E7D32", color="white", shape=ft.RoundedRectangleBorder(radius=8)),
+                                height=38,
+                                on_click=guardar_evaluacion
+                            )
+
+                            if es_movil:
+                                fila_evaluacion = ft.Column([
+                                    ft.Row([dd_evaluar, btn_guardar_cal], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+                                    tf_comentario
+                                ], spacing=8)
+                            else:
+                                fila_evaluacion = ft.Row([
+                                    dd_evaluar,
+                                    tf_comentario,
+                                    btn_guardar_cal
+                                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN, spacing=8)
+
+                            elementos_columna_orden.extend([
+                                ft.Divider(color="#EFEBE4"),
+                                fila_evaluacion
+                            ])
+
+                    def repetir_orden_accion(e, orden_ref=p):
+                        pedido_temporal["detalle"] = orden_ref["detalle"]
+                        pedido_temporal["total"] = orden_ref["total"]
+                        mostrar_pago()
+
+                    elementos_columna_orden.extend([
+                        ft.Divider(color="#EFEBE4"),
+                        ft.Row([
+                            ft.TextButton(
+                                "🔄 Repetir pedido", 
+                                style=ft.ButtonStyle(bgcolor="#E05638", color="white", shape=ft.RoundedRectangleBorder(radius=8)),
+                                height=38,
+                                on_click=repetir_orden_accion
+                            )
+                        ], alignment=ft.MainAxisAlignment.END)
+                    ])
 
                     contenido_seccion.controls.append(
                         ft.Container(
-                            content=ft.Column([
-                                ft.Row([
-                                    ft.Text(f"Orden #{p['codigo']}", size=16, weight=ft.FontWeight.BOLD, color="#2C221E"),
-                                    ft.Text(p['estado'], weight=ft.FontWeight.BOLD, color="#E05638" if "Preparación" in p['estado'] else "#2E7D32", size=13)
-                                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-                                ft.Text(f"Zona: {p.get('sede', '')}", color="#7A685D", size=13),
-                                ft.Text(f"Puesto Recojo: {p.get('puesto', '')}", color="#E05638", weight=ft.FontWeight.BOLD, size=13),
-                                ft.Text(f"Detalle: {p['detalle']}", color="#2C221E", size=14),
-                                ft.Text(f"Notas: {p.get('notas', 'Sin especificaciones')}", color="#7A685D", size=12, italic=True),
-                                ft.Text("⏱️ Tiempo máximo de preparación: 10 minutos", color="#2E7D32", size=13, weight=ft.FontWeight.W_500),
-                                ft.Text(f"Pago: {p['pago']} | Total: S/ {p['total']:.2f}", color="#7A685D", size=13),
-                                ft.Divider(color="#EFEBE4"),
-                                dd_evaluar,
-                                ft.Row([
-                                    ft.TextButton(
-                                        "🔄 Repetir pedido", 
-                                        style=ft.ButtonStyle(bgcolor="#E05638", color="white", shape=ft.RoundedRectangleBorder(radius=8)),
-                                        height=38,
-                                        on_click=lambda e: mostrar_alerta("Pedido añadido al carrito.")
-                                    )
-                                ], alignment=ft.MainAxisAlignment.END)
-                            ], spacing=8),
-                            padding=16,
+                            content=ft.Column(elementos_columna_orden, spacing=8),
+                            padding=14 if es_movil else 16,
                             bgcolor="#FFFFFF",
                             border_radius=12,
-                            width=600,
+                            width=page.width - 20 if es_movil else 650,
                             border=ft.Border(
                                 top=ft.BorderSide(1, "#EFEBE4"),
                                 bottom=ft.BorderSide(1, "#EFEBE4"),
@@ -709,12 +833,12 @@ def main(page: ft.Page):
                         ft.Container(
                             content=ft.Row([
                                 ft.Text(f"❤️ {fav_name}", color="#2C221E", weight=ft.FontWeight.BOLD, expand=True),
-                                ft.TextButton("Repetir", style=ft.ButtonStyle(bgcolor="#E05638", color="white"), on_click=lambda e: mostrar_alerta("Producto añadido a tu lista."))
+                                ft.TextButton("Repetir", style=ft.ButtonStyle(bgcolor="#E05638", color="white"), on_click=lambda e: mostrar_alerta("Producto añadido."))
                             ]),
                             bgcolor="#FFFFFF",
                             padding=12,
                             border_radius=10,
-                            width=600,
+                            width=page.width - 20 if es_movil else 600,
                             border=ft.Border(
                                 top=ft.BorderSide(1, "#EFEBE4"),
                                 bottom=ft.BorderSide(1, "#EFEBE4"),
@@ -732,6 +856,7 @@ def main(page: ft.Page):
     def mostrar_pago():
         nonlocal puesto_seleccionado, vista_actual_cliente
         vista_actual_cliente = "pago"
+        es_movil = page.width < 600
         
         puestos_disponibles = db_global["sedes"][sede_actual]
 
@@ -755,7 +880,7 @@ def main(page: ft.Page):
             page.update()
 
         dd_puestos = ft.Dropdown(
-            label="🏪 Selecciona el Puesto exacto de recojo:",
+            label="🏪 Selecciona el Puesto exacto:",
             options=[ft.dropdown.Option(key=p["id"], text=p["nombre"]) for p in puestos_disponibles],
             value=puesto_seleccionado["id"],
             bgcolor="#FFFFFF",
@@ -797,7 +922,7 @@ def main(page: ft.Page):
 
         tf_notas = ft.TextField(
             label="Especificaciones / Personalización (Opcional):",
-            hint_text="Ej. Sin mayonesa, emoliente con poco dulce...",
+            hint_text="Ej. Sin mayonesa...",
             bgcolor="#FFFFFF",
             border_color="#E0D7CD",
             focused_border_color="#E05638",
@@ -827,18 +952,18 @@ def main(page: ft.Page):
                 cantidades[k] = 0
 
             page.pubsub.send_all("NUEVO_PEDIDO")
-            mostrar_alerta(f"¡Pedido #{codigo} registrado en {puesto_seleccionado['nombre']}!")
+            mostrar_alerta(f"¡Pedido #{codigo} registrado!")
             mostrar_app_cliente("pedidos")
 
         card_pago = ft.Container(
             content=ft.Column([
-                ft.Text("💳 Confirmación de Compra", size=20, weight=ft.FontWeight.BOLD, color="#2C221E"),
+                ft.Text("💳 Confirmación de Compra", size=18 if es_movil else 20, weight=ft.FontWeight.BOLD, color="#2C221E"),
                 ft.Text(f"Resumen: {pedido_temporal['detalle']}", color="#7A685D", size=14),
-                ft.Text(f"Total a Pagar: S/ {pedido_temporal['total']:.2f}", size=22, weight=ft.FontWeight.BOLD, color="#2E7D32"),
+                ft.Text(f"Total a Pagar: S/ {pedido_temporal['total']:.2f}", size=20 if es_movil else 22, weight=ft.FontWeight.BOLD, color="#2E7D32"),
                 ft.Container(
                     content=ft.Row([
                         ft.Icon(ft.icons.TIMER, color="#E05638", size=20),
-                        ft.Text("Tiempo máximo de preparación: 10 minutos", color="#E05638", weight=ft.FontWeight.BOLD)
+                        ft.Text("Tiempo máximo: 10 minutos", color="#E05638", weight=ft.FontWeight.BOLD, size=12 if es_movil else 14)
                     ], alignment=ft.MainAxisAlignment.CENTER),
                     padding=10,
                     bgcolor="#FDF2E9",
@@ -849,13 +974,13 @@ def main(page: ft.Page):
                 card_info_puesto,
                 tf_notas,
                 dd_metodo,
-                ft.TextButton("🚀 Confirmar y Enviar a Cocina", style=ft.ButtonStyle(bgcolor="#E05638", color="white"), height=48, on_click=confirmar),
+                ft.TextButton("🚀 Confirmar y Enviar a Cocina", style=ft.ButtonStyle(bgcolor="#E05638", color="white"), height=48, width=page.width - 50 if es_movil else None, on_click=confirmar),
                 ft.OutlinedButton("⬅️ Volver al Menú", on_click=lambda e: mostrar_app_cliente("menu"))
             ], spacing=14, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
-            padding=24,
+            padding=16 if es_movil else 24,
             bgcolor="#FFFFFF",
             border_radius=16,
-            width=480,
+            width=page.width - 20 if es_movil else 480,
             border=ft.Border(
                 top=ft.BorderSide(1, "#EFEBE4"),
                 bottom=ft.BorderSide(1, "#EFEBE4"),
@@ -871,25 +996,26 @@ def main(page: ft.Page):
     def mostrar_cocina(sub_panel="pedidos"):
         nonlocal vista_actual_cocina
         vista_actual_cocina = sub_panel
+        es_movil = page.width < 600
         
-        col_contenido = ft.Column(spacing=12, width=800, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
+        col_contenido = ft.Column(spacing=12, width=page.width - 20 if es_movil else 800, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
 
         header_cocina = ft.Container(
             content=ft.Row([
-                ft.Text(f"👨‍🍳 {usuario_actual['nombre']}", size=18, weight=ft.FontWeight.BOLD, color="#2C221E"),
+                ft.Text(f"👨‍🍳 {usuario_actual['nombre']}", size=16 if es_movil else 18, weight=ft.FontWeight.BOLD, color="#2C221E"),
                 ft.TextButton(
                     "Cerrar Sesión", 
                     style=ft.ButtonStyle(color="#E05638"),
                     on_click=lambda e: mostrar_login("negocio")
                 )
             ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-            width=800
+            width=page.width - 20 if es_movil else 800
         )
 
         nav_cocina = ft.Row([
-            ft.TextButton("📋 Pedidos Cocina", style=ft.ButtonStyle(bgcolor="#E05638" if sub_panel == "pedidos" else "#EFEBE4", color="white" if sub_panel == "pedidos" else "#2C221E"), on_click=lambda e: mostrar_cocina("pedidos")),
-            ft.TextButton("📊 Métricas de Ventas", style=ft.ButtonStyle(bgcolor="#E05638" if sub_panel == "ventas" else "#EFEBE4", color="white" if sub_panel == "ventas" else "#2C221E"), on_click=lambda e: mostrar_cocina("ventas")),
-        ], spacing=12, alignment=ft.MainAxisAlignment.CENTER)
+            ft.TextButton("📋 Pedidos", style=ft.ButtonStyle(bgcolor="#E05638" if sub_panel == "pedidos" else "#EFEBE4", color="white" if sub_panel == "pedidos" else "#2C221E"), on_click=lambda e: mostrar_cocina("pedidos")),
+            ft.TextButton("📊 Métricas", style=ft.ButtonStyle(bgcolor="#E05638" if sub_panel == "ventas" else "#EFEBE4", color="white" if sub_panel == "ventas" else "#2C221E"), on_click=lambda e: mostrar_cocina("ventas")),
+        ], spacing=8 if es_movil else 12, alignment=ft.MainAxisAlignment.CENTER)
 
         def actualizar_estado(pedido_id, nuevo_estado):
             for p in db_global["pedidos"]:
@@ -906,25 +1032,25 @@ def main(page: ft.Page):
                         ft.Container(
                             content=ft.Column([
                                 ft.Row([
-                                    ft.Text(f"Orden #{p['codigo']} ({p['cliente']})", size=16, weight=ft.FontWeight.BOLD, color="#2C221E"),
-                                    ft.Text(p['estado'], color="#E05638" if "Preparación" in p['estado'] else "#2E7D32", weight=ft.FontWeight.BOLD, size=13)
+                                    ft.Text(f"Orden #{p['codigo']} ({p['cliente']})", size=15 if es_movil else 16, weight=ft.FontWeight.BOLD, color="#2C221E"),
+                                    ft.Text(p['estado'], color="#E05638" if "Preparación" in p['estado'] else "#2E7D32", weight=ft.FontWeight.BOLD, size=12 if es_movil else 13)
                                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-                                ft.Text(f"Zona: {p.get('sede', '')}", color="#7A685D", size=13),
-                                ft.Text(f"Puesto Destino: {p.get('puesto', '')}", color="#E05638", weight=ft.FontWeight.BOLD, size=13),
-                                ft.Text(f"Detalle: {p['detalle']}", size=14, color="#2E7D32", weight=ft.FontWeight.BOLD),
+                                ft.Text(f"Zona: {p.get('sede', '')}", color="#7A685D", size=12 if es_movil else 13),
+                                ft.Text(f"Puesto Destino: {p.get('puesto', '')}", color="#E05638", weight=ft.FontWeight.BOLD, size=12 if es_movil else 13),
+                                ft.Text(f"Detalle: {p['detalle']}", size=13 if es_movil else 14, color="#2E7D32", weight=ft.FontWeight.BOLD),
                                 ft.Text(f"Notas: {p.get('notas', 'Sin especificaciones')}", size=12, color="#7A685D", italic=True),
-                                ft.Text("⏱️ Límite de entrega: Máximo 10 min", size=12, color="#E05638"),
-                                ft.Text(f"Pago: {p['pago']} | Total: S/ {p['total']:.2f}", color="#7A685D", size=13),
+                                ft.Text("⏱️ Límite: Máximo 10 min", size=12, color="#E05638"),
+                                ft.Text(f"Pago: {p['pago']} | Total: S/ {p['total']:.2f}", color="#7A685D", size=12 if es_movil else 13),
                                 ft.Row([
                                     ft.TextButton("🟡 Preparando", style=ft.ButtonStyle(bgcolor="#FF9800", color="white"), on_click=lambda e, pid=p["id"]: actualizar_estado(pid, "🟡 En Preparación")),
                                     ft.TextButton("🟢 Listo", style=ft.ButtonStyle(bgcolor="#2E7D32", color="white"), on_click=lambda e, pid=p["id"]: actualizar_estado(pid, "🟢 Listo para Recoger")),
                                     ft.TextButton("✅ Entregado", style=ft.ButtonStyle(bgcolor="#1E88E5", color="white"), on_click=lambda e, pid=p["id"]: actualizar_estado(pid, "✅ Entregado")),
-                                ], wrap=True, spacing=8)
+                                ], wrap=True, spacing=6)
                             ], spacing=8),
-                            padding=14,
+                            padding=12 if es_movil else 14,
                             bgcolor="#FFFFFF",
                             border_radius=12,
-                            width=600,
+                            width=page.width - 20 if es_movil else 600,
                             border=ft.Border(
                                 top=ft.BorderSide(1, "#EFEBE4"),
                                 bottom=ft.BorderSide(1, "#EFEBE4"),
@@ -943,30 +1069,30 @@ def main(page: ft.Page):
             col_contenido.controls.append(
                 ft.Container(
                     content=ft.Column([
-                        ft.Text("📈 Resumen de Ventas - Panel Administrador", size=18, weight=ft.FontWeight.BOLD, color="#2C221E"),
+                        ft.Text("📈 Resumen de Ventas", size=16 if es_movil else 18, weight=ft.FontWeight.BOLD, color="#2C221E"),
                         ft.Divider(color="#EFEBE4"),
                         ft.Row([
                             ft.Column([
-                                ft.Text("Ventas Totales", color="#7A685D", size=13),
-                                ft.Text(f"S/ {total_recaudado:.2f}", size=22, weight=ft.FontWeight.BOLD, color="#2E7D32")
+                                ft.Text("Ventas Totales", color="#7A685D", size=12 if es_movil else 13),
+                                ft.Text(f"S/ {total_recaudado:.2f}", size=20 if es_movil else 22, weight=ft.FontWeight.BOLD, color="#2E7D32")
                             ]),
                             ft.Column([
-                                ft.Text("Órdenes Atendidas", color="#7A685D", size=13),
-                                ft.Text(str(cant_ordenes), size=22, weight=ft.FontWeight.BOLD, color="#E05638")
+                                ft.Text("Órdenes", color="#7A685D", size=12 if es_movil else 13),
+                                ft.Text(str(cant_ordenes), size=20 if es_movil else 22, weight=ft.FontWeight.BOLD, color="#E05638")
                             ])
                         ], alignment=ft.MainAxisAlignment.SPACE_AROUND),
                         ft.Divider(color="#EFEBE4"),
-                        ft.Text("💳 Métodos de Pago Preferidos:", weight=ft.FontWeight.BOLD, color="#2C221E", size=14),
+                        ft.Text("💳 Métodos de Pago:", weight=ft.FontWeight.BOLD, color="#2C221E", size=14),
                         ft.Text(f"• Yape: {pagos_yape} órdenes", color="#7A685D", size=13),
                         ft.Text(f"• Plin: {pagos_plin} órdenes", color="#7A685D", size=13),
                         ft.Text(f"• Tarjeta / Otros: {pagos_tarjeta} órdenes", color="#7A685D", size=13),
                         ft.Divider(color="#EFEBE4"),
-                        ft.Text("⭐ Tiempo Promedio de Entrega: < 8 minutos", color="#2E7D32", weight=ft.FontWeight.BOLD, size=14)
+                        ft.Text("⭐ Tiempo Promedio: < 8 minutos", color="#2E7D32", weight=ft.FontWeight.BOLD, size=13 if es_movil else 14)
                     ], spacing=10),
-                    padding=20,
+                    padding=16 if es_movil else 20,
                     bgcolor="#FFFFFF",
                     border_radius=12,
-                    width=600,
+                    width=page.width - 20 if es_movil else 600,
                     border=ft.Border(
                         top=ft.BorderSide(1, "#EFEBE4"),
                         bottom=ft.BorderSide(1, "#EFEBE4"),
@@ -985,20 +1111,15 @@ def main(page: ft.Page):
         contenido_principal.controls.clear()
         contenido_principal.controls.append(contenedor_cocina)
         page.update()
+
     page.controls.clear()
     page.controls.append(contenido_principal)
-    
-    mostrar_login("cliente", "login")
+    mostrar_splash()
 
-import os
-import flet_fastapi
-
-# Obtener ruta absoluta de la carpeta assets
 assets_path = os.path.abspath("assets")
 
-# Envolver la aplicación de Flet para servidor
 app = flet_fastapi.app(
-    main, 
+    main,
     assets_dir=assets_path,
     secret_key="clave_secreta_desayunos_usil"
 )
