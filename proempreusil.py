@@ -23,7 +23,7 @@ db_global = {
                 "nombre": "Puesto #01",
                 "referencia": "Esq. Av. Industrial con Av. Pacífico (Puerta Principal IE)",
                 "vendedor": "Don Carlos",
-                "icon": ft.icons.STOREFRONT,
+                "icon": ft.Icons.STOREFRONT,
                 "color": "#E05638"
             },
             {
@@ -31,7 +31,7 @@ db_global = {
                 "nombre": "Puesto #02",
                 "referencia": "Av. Pacífico cdra 2 (Frente al paradero)",
                 "vendedor": "Sra. María",
-                "icon": ft.icons.SHOPPING_BAG,
+                "icon": ft.Icons.SHOPPING_BAG,
                 "color": "#1E88E5"
             },
             {
@@ -39,7 +39,7 @@ db_global = {
                 "nombre": "Puesto #03",
                 "referencia": "Av. Industrial cdra 4 (Lado de la rotonda)",
                 "vendedor": "Don Jorge",
-                "icon": ft.icons.STORE,
+                "icon": ft.Icons.STORE,
                 "color": "#2E7D32"
             }
         ]
@@ -1119,5 +1119,5 @@ app = flet_fastapi.app(
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.environ.get("PORT", 10000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run("proempreusil:app", host="0.0.0.0", port=port)
