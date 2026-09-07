@@ -2,8 +2,6 @@ import flet as ft
 import random
 import string
 import re
-import time
-import threading
 import os
 import flet_fastapi
 
@@ -90,7 +88,10 @@ def main(page: ft.Page):
         sb = ft.SnackBar(content=ft.Text(mensaje, color="white"), bgcolor="#E05638")
         page.overlay.append(sb)
         sb.open = True
-        page.update()
+        try:
+            page.update()
+        except Exception:
+            pass
 
     productos = [
         {"cat": "Bebidas", "nombre": "Maca", "precio": 2.50, "icon": ft.icons.LOCAL_DRINK, "desc": "Bebida energizante natural"},
@@ -121,37 +122,6 @@ def main(page: ft.Page):
             pass
 
     page.pubsub.subscribe(recibir_actualizacion_global)
-
-    def mostrar_splash():
-        splash_content = ft.Container(
-            content=ft.Column([
-                ft.Container(
-                    content=ft.Text("D", size=64, weight=ft.FontWeight.BOLD, color="white"),
-                    bgcolor="#E05638",
-                    width=110,
-                    height=110,
-                    border_radius=28,
-                    alignment=ft.alignment.center,
-                    shadow=ft.BoxShadow(spread_radius=2, blur_radius=15, color="#20000000")
-                ),
-                ft.Container(height=15),
-                ft.Text("Proyecto Empresarial USIL", size=13, color="#7A685D", weight=ft.FontWeight.W_500)
-            ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
-            alignment=ft.alignment.center,
-            bgcolor="#FFFFFF",
-            expand=True,
-            width=page.width,
-            height=page.height if page.height else 800
-        )
-        contenido_principal.controls.clear()
-        contenido_principal.controls.append(splash_content)
-        page.update()
-
-        def cambiar_a_login():
-            time.sleep(1.2)
-            mostrar_login("cliente", "login")
-
-        threading.Thread(target=cambiar_a_login, daemon=True).start()
 
     def mostrar_login(tipo_login="cliente", sub_accion="login"):
         def ingresar_cliente(e):
@@ -218,7 +188,10 @@ def main(page: ft.Page):
 
         def seleccionar_cuenta_google(correo_Elegido):
             dlg_selector.open = False
-            page.update()
+            try:
+                page.update()
+            except Exception:
+                pass
             
             correo_g = correo_Elegido.strip().lower()
             if correo_g in db_global["usuarios"]:
@@ -271,7 +244,7 @@ def main(page: ft.Page):
                 tf_nuevo_g
             ], tight=True, spacing=10),
             actions=[
-                ft.TextButton("Cancelar", on_click=lambda e: setattr(dlg_selector, 'open', False) or page.update()),
+                ft.TextButton("Cancelar", on_click=lambda e: setattr(dlg_selector, 'open', False)),
                 ft.TextButton("Continuar con este correo", on_click=lambda e: seleccionar_cuenta_google(tf_nuevo_g.value))
             ]
         )
@@ -279,7 +252,10 @@ def main(page: ft.Page):
         def abrir_selector_google(e):
             page.overlay.append(dlg_selector)
             dlg_selector.open = True
-            page.update()
+            try:
+                page.update()
+            except Exception:
+                pass
 
         fn_accion = ingresar_cliente if sub_accion == "login" else registrar_cliente
 
@@ -384,7 +360,7 @@ def main(page: ft.Page):
 
             contenido_principal.controls.clear()
             contenido_principal.controls.append(vista_celular_sin_tarjeta)
-            page.update()
+            contenido_principal.update()
             return
 
         if tipo_login == "cliente" and sub_accion == "manual":
@@ -480,7 +456,7 @@ def main(page: ft.Page):
         contenido_principal.controls.clear()
         contenido_principal.controls.append(ft.Container(height=10))
         contenido_principal.controls.append(tarjeta_principal)
-        page.update()
+        contenido_principal.update()
 
     def mostrar_app_cliente(vista_activa="menu"):
         nonlocal filtro_categoria, busqueda_texto, sede_actual, puesto_seleccionado, vista_actual_cliente
@@ -551,7 +527,10 @@ def main(page: ft.Page):
         def actualizar_total():
             t = sum(cantidades[p["nombre"]] * p["precio"] for p in productos)
             lbl_total.value = f"Total: S/ {t:.2f}"
-            page.update()
+            try:
+                page.update()
+            except Exception:
+                pass
 
         def tarjeta_producto(prod):
             lbl_c = ft.Text(str(cantidades[prod["nombre"]]), size=15, weight=ft.FontWeight.BOLD, color="#2C221E")
@@ -574,7 +553,10 @@ def main(page: ft.Page):
                 else:
                     db_global["favoritos"].remove(prod["nombre"])
                     e.control.icon_color = "#C5B8AB"
-                page.update()
+                try:
+                    page.update()
+                except Exception:
+                    pass
 
             es_fav = prod["nombre"] in db_global["favoritos"]
             fav_color = "#E05638" if es_fav else "#C5B8AB"
@@ -628,7 +610,10 @@ def main(page: ft.Page):
                     ft.Text(f"📋 Catálogo ({len(prods_filtrados)} opciones)", size=15, weight=ft.FontWeight.BOLD, color="#2C221E"),
                     ft.Row([tarjeta_producto(p) for p in prods_filtrados], wrap=True, alignment=ft.MainAxisAlignment.CENTER, spacing=12 if es_movil else 16)
                 ])
-                page.update()
+                try:
+                    page.update()
+                except Exception:
+                    pass
 
             def filtrar_cat(cat):
                 nonlocal filtro_categoria
@@ -671,7 +656,10 @@ def main(page: ft.Page):
                             on_click=lambda e, c=cat: filtrar_cat(c)
                         )
                     )
-                page.update()
+                try:
+                    page.update()
+                except Exception:
+                    pass
 
             actualizar_chips_cat()
 
@@ -851,7 +839,7 @@ def main(page: ft.Page):
         contenedor_cliente.controls.extend([banner_estado, header, nav_buttons, contenido_seccion])
         contenido_principal.controls.clear()
         contenido_principal.controls.append(contenedor_cliente)
-        page.update()
+        contenido_principal.update()
 
     def mostrar_pago():
         nonlocal puesto_seleccionado, vista_actual_cliente
@@ -877,7 +865,10 @@ def main(page: ft.Page):
             lbl_puesto_nombre.value = puesto_seleccionado["nombre"]
             lbl_puesto_ref.value = f"📍 Referencia: {puesto_seleccionado['referencia']}"
             lbl_puesto_vend.value = f"👨‍🍳 Atendido por: {puesto_seleccionado['vendedor']}"
-            page.update()
+            try:
+                page.update()
+            except Exception:
+                pass
 
         dd_puestos = ft.Dropdown(
             label="🏪 Selecciona el Puesto exacto:",
@@ -991,7 +982,7 @@ def main(page: ft.Page):
 
         contenido_principal.controls.clear()
         contenido_principal.controls.append(card_pago)
-        page.update()
+        contenido_principal.update()
 
     def mostrar_cocina(sub_panel="pedidos"):
         nonlocal vista_actual_cocina
@@ -1110,11 +1101,13 @@ def main(page: ft.Page):
 
         contenido_principal.controls.clear()
         contenido_principal.controls.append(contenedor_cocina)
-        page.update()
+        contenido_principal.update()
 
     page.controls.clear()
     page.controls.append(contenido_principal)
-    mostrar_splash()
+    
+    # En lugar de usar hilos y time.sleep con page.update() al arrancar, cargamos directamente el login
+    mostrar_login("cliente", "login")
 
 assets_path = os.path.abspath("assets")
 
