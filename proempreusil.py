@@ -447,7 +447,7 @@ def main(page: ft.Page):
         contenido_principal.controls.clear()
         contenido_principal.controls.append(ft.Container(height=10))
         contenido_principal.controls.append(tarjeta_principal)
-        page.update()
+        
 
     def mostrar_app_cliente(vista_activa="menu"):
         nonlocal filtro_categoria, busqueda_texto, sede_actual, puesto_seleccionado, vista_actual_cliente
