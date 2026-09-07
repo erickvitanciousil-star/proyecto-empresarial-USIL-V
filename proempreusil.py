@@ -985,8 +985,9 @@ def main(page: ft.Page):
         contenido_principal.controls.clear()
         contenido_principal.controls.append(contenedor_cocina)
         page.update()
-
-    page.add(contenido_principal)
+    page.controls.clear()
+    page.controls.append(contenido_principal)
+    page.update()
     mostrar_login("cliente", "login")
 
 import os
