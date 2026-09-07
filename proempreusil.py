@@ -22,7 +22,7 @@ db_global = {
                 "nombre": "Puesto #01",
                 "referencia": "Esq. Av. Industrial con Av. Pacífico (Puerta Principal IE)",
                 "vendedor": "Don Carlos",
-                "icon": ft.Icons.STOREFRONT,
+                "icon": ft.icons.STOREFRONT,
                 "color": "#E05638"
             },
             {
@@ -30,7 +30,7 @@ db_global = {
                 "nombre": "Puesto #02",
                 "referencia": "Av. Pacífico cdra 2 (Frente al paradero)",
                 "vendedor": "Sra. María",
-                "icon": ft.Icons.SHOPPING_BAG,
+                "icon": ft.icons.SHOPPING_BAG,
                 "color": "#1E88E5"
             },
             {
@@ -38,7 +38,7 @@ db_global = {
                 "nombre": "Puesto #03",
                 "referencia": "Av. Industrial cdra 4 (Lado de la rotonda)",
                 "vendedor": "Don Jorge",
-                "icon": ft.Icons.STORE,
+                "icon": ft.icons.STORE,
                 "color": "#2E7D32"
             }
         ]
@@ -90,11 +90,11 @@ def main(page: ft.Page):
         page.update()
 
     productos = [
-        {"cat": "Bebidas", "nombre": "Maca", "precio": 2.50, "icon": ft.Icons.LOCAL_DRINK, "desc": "Bebida energizante natural"},
-        {"cat": "Bebidas", "nombre": "Emoliente", "precio": 2.50, "icon": ft.Icons.LOCAL_DRINK, "desc": "Con linaza y hierbas tradicionales"},
-        {"cat": "Bebidas", "nombre": "Quinua", "precio": 2.50, "icon": ft.Icons.LOCAL_DRINK, "desc": "Quinua caliente tradicional"},
-        {"cat": "Bebidas", "nombre": "Quinua con Leche", "precio": 3.00, "icon": ft.Icons.LOCAL_DRINK, "desc": "Quinua cremosa c/ leche"},
-        {"cat": "Bebidas", "nombre": "Quacker", "precio": 2.50, "icon": ft.Icons.LOCAL_DRINK, "desc": "Avena tradicional bien caliente"},
+        {"cat": "Bebidas", "nombre": "Maca", "precio": 2.50, "icon": ft.icons.LOCAL_DRINK, "desc": "Bebida energizante natural"},
+        {"cat": "Bebidas", "nombre": "Emoliente", "precio": 2.50, "icon": ft.icons.LOCAL_DRINK, "desc": "Con linaza y hierbas tradicionales"},
+        {"cat": "Bebidas", "nombre": "Quinua", "precio": 2.50, "icon": ft.icons.LOCAL_DRINK, "desc": "Quinua caliente tradicional"},
+        {"cat": "Bebidas", "nombre": "Quinua con Leche", "precio": 3.00, "icon": ft.icons.LOCAL_DRINK, "desc": "Quinua cremosa c/ leche"},
+        {"cat": "Bebidas", "nombre": "Quacker", "precio": 2.50, "icon": ft.icons.LOCAL_DRINK, "desc": "Avena tradicional bien caliente"},
         {"cat": "Panes", "nombre": "Pan con Pollo", "precio": 1.50, "img": "https://i.ibb.co/q33Y5bSC/Gemini-Generated-Image-do9fwedo9fwedo9f.png", "desc": "Pollo deshilachado c/ mayonesa"},
         {"cat": "Panes", "nombre": "Pan con Palta", "precio": 1.50, "img": "https://i.ibb.co/FLbZ8CZ4/Gemini-Generated-Image-c4he2wc4he2wc4he.png", "desc": "Palta fuerte laminada fresca"},
         {"cat": "Panes", "nombre": "Pan con Chicharrón", "precio": 1.50, "img": "https://i.ibb.co/mr00xwZ1/Gemini-Generated-Image-hxammahxammahxam.png", "desc": "Chicharrón crujiente c/ camote"},
@@ -271,7 +271,7 @@ def main(page: ft.Page):
                     content=ft.Row([
                         ft.Image(src=PERU_FLAG_URL, width=20, height=14, fit="contain"),
                         ft.Text("+51", size=14, color="#2C221E", weight=ft.FontWeight.W_500),
-                        ft.Icon(ft.Icons.ARROW_DROP_DOWN, size=18, color="#5F6368")
+                        ft.Icon(ft.icons.ARROW_DROP_DOWN, size=18, color="#5F6368")
                     ], spacing=6, alignment=ft.MainAxisAlignment.CENTER, vertical_alignment=ft.CrossAxisAlignment.CENTER),
                     bgcolor="#F1F3F4",
                     padding=ft.padding.symmetric(horizontal=10, vertical=12),
@@ -316,7 +316,7 @@ def main(page: ft.Page):
 
         btn_celular_estilo = ft.Container(
             content=ft.Row([
-                ft.Icon(ft.Icons.SMARTPHONE, size=20, color="#5F6368"),
+                ft.Icon(ft.icons.SMARTPHONE, size=20, color="#5F6368"),
                 ft.Text("Continuar con tu celular", size=14, color="#2C221E", weight=ft.FontWeight.W_600)
             ], alignment=ft.MainAxisAlignment.CENTER, spacing=10),
             padding=12,
@@ -331,7 +331,7 @@ def main(page: ft.Page):
         form_contenido = ft.Column(spacing=12, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
 
         header_app_nombre = ft.Row([
-            ft.Icon(ft.Icons.BUSINESS_CENTER, size=18, color="#E05638"),
+            ft.Icon(ft.icons.BUSINESS_CENTER, size=18, color="#E05638"),
             ft.Text("Proyecto Empresarial USIL", size=14, weight=ft.FontWeight.BOLD, color="#E05638")
         ], alignment=ft.MainAxisAlignment.CENTER, spacing=6)
 
@@ -480,7 +480,7 @@ def main(page: ft.Page):
             es_listo = "Listo" in p_ultimo["estado"]
             banner_estado = ft.Container(
                 content=ft.Row([
-                    ft.Icon(ft.Icons.NOTIFICATIONS_ACTIVE if es_listo else ft.Icons.ACCESS_TIME, color="white", size=18),
+                    ft.Icon(ft.icons.NOTIFICATIONS_ACTIVE if es_listo else ft.icons.ACCESS_TIME, color="white", size=18),
                     ft.Text(f"Pedido #{p_ultimo['codigo']}: {p_ultimo['estado']} en {p_ultimo.get('puesto', '')}", color="white", weight=ft.FontWeight.BOLD, size=13)
                 ], alignment=ft.MainAxisAlignment.CENTER, spacing=8),
                 bgcolor="#2E7D32" if es_listo else "#E05638",
@@ -552,14 +552,14 @@ def main(page: ft.Page):
                 content=ft.Column([
                     ft.Stack([
                         ft.Container(content=media_control, height=110, width=220, bgcolor="#FDF2E9", border_radius=10),
-                        ft.IconButton(ft.Icons.FAVORITE, icon_color=fav_color, icon_size=20, top=2, right=2, on_click=toggle_fav)
+                        ft.IconButton(ft.icons.FAVORITE, icon_color=fav_color, icon_size=20, top=2, right=2, on_click=toggle_fav)
                     ]),
                     ft.Text(prod["nombre"], weight=ft.FontWeight.BOLD, color="#2C221E", size=14, no_wrap=True),
                     ft.Text(f"S/ {prod['precio']:.2f}", color="#2E7D32", weight=ft.FontWeight.BOLD, size=13),
                     ft.Row([
-                        ft.IconButton(ft.Icons.REMOVE_CIRCLE_OUTLINE, icon_color="#E05638", on_click=rem),
+                        ft.IconButton(ft.icons.REMOVE_CIRCLE_OUTLINE, icon_color="#E05638", on_click=rem),
                         lbl_c,
-                        ft.IconButton(ft.Icons.ADD_CIRCLE_OUTLINE, icon_color="#2E7D32", on_click=add)
+                        ft.IconButton(ft.icons.ADD_CIRCLE_OUTLINE, icon_color="#2E7D32", on_click=add)
                     ], alignment=ft.MainAxisAlignment.CENTER)
                 ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=4),
                 bgcolor="#FFFFFF",
@@ -837,7 +837,7 @@ def main(page: ft.Page):
                 ft.Text(f"Total a Pagar: S/ {pedido_temporal['total']:.2f}", size=22, weight=ft.FontWeight.BOLD, color="#2E7D32"),
                 ft.Container(
                     content=ft.Row([
-                        ft.Icon(ft.Icons.TIMER, color="#E05638", size=20),
+                        ft.Icon(ft.icons.TIMER, color="#E05638", size=20),
                         ft.Text("Tiempo máximo de preparación: 10 minutos", color="#E05638", weight=ft.FontWeight.BOLD)
                     ], alignment=ft.MainAxisAlignment.CENTER),
                     padding=10,
