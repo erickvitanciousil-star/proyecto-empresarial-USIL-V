@@ -987,7 +987,7 @@ def main(page: ft.Page):
         page.update()
     page.controls.clear()
     page.controls.append(contenido_principal)
-    page.update()
+    
     mostrar_login("cliente", "login")
 
 import os
